@@ -1,0 +1,4 @@
+Set ListFonts$Dir <Obey$Dir>
+IconSprites <Obey$Dir>.!Sprites
+WimpSlot -Min 56k -Max 56k
+Run <Obey$Dir>.!RunImage

@@ -1,0 +1,15 @@
+Task.Name:ListFonts
+Task.Purpose:To create a list of fonts
+
+Menu.Title:ListFonts
+Menu.Body:Info,One font per family,Split list up,Quit
+Sub.Title:Number
+Sub.Body:1
+
+Icon.Cancel:Cancel
+Icon.Save:Save
+Icon.Write:FontList
+Win.Title:Save as
+
+Error.NoMem:Not enough free memory
+Error.Fatal:Sorry, <Task.Name> has suffered a internal error (%s) and must exit immediatly

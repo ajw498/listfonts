@@ -1,0 +1,17 @@
+                                 !ListFonts ©Alex Waugh 1999
+                                 ~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+Listfonts is a program that can be used to produce a list of all the fonts availiable on your computer.  This is especially useful if you have lots of fonts but cannot remember what they are all like.
+List fonts produces a textfile of all the fonts available at the time it is run, and the textfile can then be imported into Impression for printing.  Although it has only been tested with Impression Junior and Impression II, I see no reason why it will not work with other versions.  If you do not have any version of Impression then Impression Junior is avaliable free to download from Computer Concepts website (I think) and was on the Archimedes World CDROM a couple of years ago.
+
+Using ListFonts
+~~~~~~~~~~~~~~~~
+Just double click on the !ListFonts icon, and a standard save window will appear.  Drag the icon to an empty Impression window, and the list will be generated.  This may take a little time if you have a lot of fonts and/or a slower computer.  Then you can format the list into columns or however you want using Impression normally, printing it out if you wish.
+The default is to produce a list with one entry for each font family, eg. bold and italic variants of a font are not listed.  If you want all varients of a font to be listed then before dragging the icon to the Impression window click the middle mouse button, and click on the menu item "One font per family" to deselect it, then carry on as normal.
+I strongly advise you to set the font cache as big as possible, although even when it is a megabyte (it's maximum size) on a StrongARM there is still a lot of disc activity, and it takes a long time to redraw a page with a long list of fonts on.
+
+Problems
+~~~~~~~~
+Either Impression or the font manager, I'm not sure which, cannot cope with more than 250 fonts in a document at once, and so if you try with a list o more than 250 fonts, Impression gives an error and will not let you continue.  Therefore if you have more than 250 fonts you should select the "Split up list" menu item, altering the number of fonts per list if you wish, and the icon will change to a directory.  This can then be dragged to a disc, and the list of fonts will be split into several files within the directory, named numerically.  These files can then be dragged to the Impression window, although it is recommended that Impression is quit then reloaded between each file.
+
+If a leafname of more than 10 characters is entered into the writable filename icon then when the file is saved it is truncated to 10 characters.  This may be fixed in a future release.
