@@ -1,0 +1,11 @@
+
+v1.01 19-Feb-00
+
+Added menu item to allow choice of text to be used in the list
+Removed restriction on filename length
+Adds a leading zero when needed to files when list is split, so the filer sorts them properly
+Released under the GNU GPL
+
+v1.00 7-Jan-99
+
+Initial version
