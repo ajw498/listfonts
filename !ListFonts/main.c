@@ -16,7 +16,7 @@
 	along with this program; if not, write to the Free Software
 	Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 
-	$Id: !RunImage.c,v 1.3 2000-02-19 13:43:09 uid1 Exp $
+	$Id: main.c,v 1.1 2002-12-05 20:33:20 ajw Exp $
 	
 */
 
@@ -52,7 +52,7 @@
 
 /*	Macros  */
 
-#define VERSION "1.01 (19-Feb-00)"
+#define VERSION "1.02 (5-Dec-02)"
 #define DIRPREFIX "ListFonts"
 
 #define icon_SAVE   0

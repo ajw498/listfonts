@@ -1,0 +1,3 @@
+Dir <Obey$Dir>
+remove listfonts/zip
+zip -r -9 listfonts/zip !ListFonts Copying -x *CVS* *.o.*

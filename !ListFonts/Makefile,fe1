@@ -1,23 +1,23 @@
 
 LIBS	=	\
-		L:AJWLib.o.AJWLib\
-		L:Desk.o.Desk
+		AJWLib:AJWLib.o.AJWLib\
+		Desk:o.Desk
 
 
 OBJECTS	=	\
-		!RunImage.o
+		main.o
 
-INCLUDE	=	L:
+INCLUDE	=	-IDesk: -IAJWLib:
 
 TARGET		=	!RunImage
 
-CCFLAGS		=	$(CCEXTRA) -mthrowback -mstubs -Wall -pedantic -ansi -O3
+CCFLAGS		=	$(CCEXTRA) $(INCLUDE) -mthrowback -mlibscl -Wall -pedantic -ansi -O3
 LINKFLAGS	=	$(LINKEXTRA)
 
 CC		=	gcc -c $(CCFLAGS)
 LINK		=	gcc $(CCFLAGS) $(LINKFLAGS)
 
-
+all: $(TARGET)
 
 .c.o: $(HEADERS) $(LIBS)
 	$(CC) $< -o $@
