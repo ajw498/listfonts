@@ -1,6 +1,23 @@
 /*
 	ListFonts
 	©Alex Waugh 1999
+
+	This program is free software; you can redistribute it and/or modify
+	it under the terms of the GNU General Public License as published by
+	the Free Software Foundation; either version 2 of the License, or
+	(at your option) any later version.
+	
+	This program is distributed in the hope that it will be useful,
+	but WITHOUT ANY WARRANTY; without even the implied warranty of
+	MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+	GNU General Public License for more details.
+	
+	You should have received a copy of the GNU General Public License
+	along with this program; if not, write to the Free Software
+	Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
+
+	$Id: !RunImage.c,v 1.3 2000-02-19 13:43:09 uid1 Exp $
+	
 */
 
 /*	Includes  */
@@ -35,7 +52,7 @@
 
 /*	Macros  */
 
-#define VERSION "1.00 (7-Jan-99)"
+#define VERSION "1.01 (19-Feb-00)"
 #define DIRPREFIX "ListFonts"
 
 #define icon_SAVE   0
@@ -46,15 +63,19 @@
 #define menuitem_INFO    0
 #define menuitem_ONEFONT 1
 #define menuitem_SPLIT   2
-#define menuitem_QUIT    3
+#define menuitem_TEXT    3
+#define menuitem_QUIT    4
 
 #define SAVEFILETYPE 0xFFF
+
+#define Font_ListFonts 0x40091
 
 /*	Variables  */
 
 Desk_window_handle mainwin,info;
-Desk_menu_ptr menu,submenu;
+Desk_menu_ptr menu,submenu,textmenu;
 char splitnumber[5]="249";
+char textused[256];
 
 /*	Functions  */
 
@@ -92,21 +113,23 @@ void Error(void)
 void SaveFile(char *filename)
 {
 	FILE *file;
-	char fontname[256],filename2[300],oldfontname[255];
+	char fontname[256],filename2[300],oldfontname[255],*ch;
 	int counter,count=0,max,current=1,tick,onefont;
 	Desk_Hourglass_On();
 	max=atoi(splitnumber);
+	if ((ch=strchr(textused,'%'))!=strrchr(textused,'%')) { Desk_Msgs_Report(1,"Error.BadStr:","%%","%%s"); return;}
+	if (ch) if (ch[1]!='s') { Desk_Msgs_Report(1,"Error.BadStr:","%%","%%s"); return; }
 	Desk_Menu_GetFlags(menu,menuitem_SPLIT,&tick,NULL);
 	Desk_Menu_GetFlags(menu,menuitem_ONEFONT,&onefont,NULL);
 	if (tick) {
 		Desk_SWI(5,0,Desk_SWI_OS_File,8,filename,NULL,NULL,0);
 		strcpy(filename2,filename);
-		strcat(filename2,".1");
+		strcat(filename2,".01");
 		if ((file=fopen(filename2,"w"))==NULL) Error();
 	} else {
     	if ((file=fopen(filename,"w"))==NULL) Error();
     }
-	Desk_SWI(7,3,0x40091,NULL,fontname,0x20000,256,fontname,256,0,NULL,NULL,&counter); /*Font_ListFonts*/
+	Desk_SWI(7,3,Font_ListFonts,NULL,fontname,0x20000,256,fontname,256,0,NULL,NULL,&counter);
 	while ((counter)!=-1) {
 		if (onefont) {
 			char *end;
@@ -117,17 +140,21 @@ void SaveFile(char *filename)
 			if (strcmp(oldfontname,newfontname)!=0) {
 				count++;
 				strcpy(oldfontname,newfontname);
-				fprintf(file,"{font %s}%s{font}\n",fontname,newfontname);
+				fprintf(file,"{font %s}",fontname);
+				fprintf(file,textused,newfontname);
+				fprintf(file,"{font}\n");
 			}
 		} else {
-			fprintf(file,"{font %s}%s{font}\n",fontname,fontname);
+			fprintf(file,"{font %s}",fontname);
+			fprintf(file,textused,fontname);
+			fprintf(file,"{font}\n");
 			count++;
 		}
-		Desk_SWI(7,3,0x40091,NULL,fontname,counter,256,fontname,256,0,NULL,NULL,&counter); /*Font_ListFonts*/
+		Desk_SWI(7,3,Font_ListFonts,NULL,fontname,counter,256,fontname,256,0,NULL,NULL,&counter);
 		if (count>=max && tick) {
 			count=0;
 			fclose(file);
-			sprintf(filename2,"%s.%d",filename,++current);
+			sprintf(filename2,"%s.%.2d",filename,++current);
 			if ((file=fopen(filename2,"w"))==NULL) Error();
 		}
 
@@ -142,7 +169,9 @@ void DragEnded(void *r)
 	Desk_message_block msgblk;
 	char leafname[256];
 	Desk_Wimp_GetPointerInfo(&mouseblk);
-	msgblk.header.size=56;
+	Desk_Filing_GetLeafname(Desk_Icon_GetTextPtr(mainwin,icon_WRITE),leafname);
+	msgblk.header.size=45+strlen(leafname);
+	msgblk.header.size=(msgblk.header.size+3) & ~3; /*Word align*/
 	msgblk.header.yourref=0;
 	msgblk.header.action=Desk_message_DATASAVE;
 	msgblk.data.datasave.window=mouseblk.window;
@@ -150,8 +179,6 @@ void DragEnded(void *r)
 	msgblk.data.datasave.pos=mouseblk.pos;
 	msgblk.data.datasave.estsize=1024;
 	msgblk.data.datasave.filetype=SAVEFILETYPE;
-	Desk_Filing_GetLeafname(Desk_Icon_GetTextPtr(mainwin,icon_WRITE),leafname);
-	if (strlen(leafname)>10) leafname[10]='\0';
 	strcpy(msgblk.data.datasave.leafname,leafname);
 	Desk_Wimp_SendMessage(Desk_event_USERMESSAGERECORDED,&msgblk,mouseblk.window,mouseblk.icon);
 }
@@ -264,8 +291,12 @@ int main(void)
 	menu=AJWLib_Menu_CreateFromMsgs("Menu.Title:","Menu.Body:",MenuClick,NULL);
 	submenu=AJWLib_Menu_CreateFromMsgs("Sub.Title:","Sub.Body:",SubMenuClick,NULL);
 	Desk_Menu_MakeWritable(submenu,0,splitnumber,5,"A0-9");
+	textmenu=AJWLib_Menu_CreateFromMsgs("Text.Title:","Text.Default:",NULL,NULL);
+	Desk_Menu_MakeWritable(textmenu,0,textused,256,"");
+	Desk_Msgs_Lookup("Text.Default:",textused,255);
 	Desk_Menu_AddSubMenu(menu,menuitem_INFO,(Desk_menu_ptr)info);
 	Desk_Menu_AddSubMenu(menu,menuitem_SPLIT,submenu);
+	Desk_Menu_AddSubMenu(menu,menuitem_TEXT,textmenu);
 	AJWLib_Menu_Attach(mainwin,Desk_event_ANY,menu,Desk_button_MENU);
 	Desk_Menu_SetFlags(menu,menuitem_ONEFONT,Desk_TRUE,Desk_FALSE);
 	Desk_Drag_Initialise(Desk_FALSE);
